@@ -1,0 +1,6 @@
+{
+  "name": "QR Spark",
+  "description": "A professional-grade QR code generator powered by goqr.me, featuring multiple export formats and real-time customization.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
