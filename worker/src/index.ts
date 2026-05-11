@@ -66,7 +66,15 @@ export default {
 
       // Public: live page
       const live = pathname.match(/^\/c\/([a-zA-Z0-9_-]+)$/);
-      if (live) return handleLivePage(request, env, live[1]);
+      if (live) {
+        const accept = request.headers.get('Accept') ?? '';
+        if (accept.includes('text/html')) {
+          // Browser navigation — serve the SPA and let React Router render LivePage
+          if (env.ASSETS) return env.ASSETS.fetch(new Request(new URL('/', request.url).toString(), request));
+          return new Response('Not found', { status: 404 });
+        }
+        return handleLivePage(request, env, live[1]);
+      }
 
       // Public: image proxy
       if (pathname.startsWith('/api/images/')) {
