@@ -4,10 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Slider } from '@/components/ui/slider';
 import { Toaster } from '@/components/ui/sonner';
 import { toast } from 'sonner';
-import { Download, Share2, RefreshCw, CheckCircle2, ArrowLeft } from 'lucide-react';
+import { Download, CheckCircle2, ArrowLeft } from 'lucide-react';
 import { LANGUAGE_LABELS, SUPPORTED_LANGUAGES } from '../i18n/index';
 
 type QRFormat = 'png' | 'jpg' | 'svg';
@@ -102,7 +101,15 @@ export default function QRGenerator() {
                 <div className="space-y-3">
                   <Label className="text-[10px] uppercase tracking-widest text-slate-300 font-bold">{t('tool.margin')}</Label>
                   <div className="flex items-center gap-4 py-2 min-h-10">
-                    <Slider value={margin} onValueChange={val => setMargin(Array.isArray(val) ? val : [val])} max={20} min={0} step={1} className="flex-1" />
+                    <input
+                      type="range"
+                      min={0}
+                      max={20}
+                      step={1}
+                      value={margin[0]}
+                      onChange={e => setMargin([parseInt(e.target.value)])}
+                      className="flex-1 accent-sky-400 h-2"
+                    />
                     <span className="text-sm font-mono text-white w-10 text-right tabular-nums">{margin[0]}px</span>
                   </div>
                 </div>
