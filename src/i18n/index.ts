@@ -22,7 +22,15 @@ export const LANGUAGE_LABELS: Record<SupportedLanguage, string> = {
   fr: 'Français',
 };
 
-const resources = { en, zh, ja, ko, vi, de, fr };
+const resources = {
+  en: { translation: en },
+  zh: { translation: zh },
+  ja: { translation: ja },
+  ko: { translation: ko },
+  vi: { translation: vi },
+  de: { translation: de },
+  fr: { translation: fr },
+};
 
 function getInitialLanguage(): string {
   // Check localStorage first, then browser language
