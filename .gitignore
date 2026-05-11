@@ -6,3 +6,7 @@ coverage/
 *.log
 .env*
 !.env.example
+worker/worker/
+install-vcredist.ps1
+UsersWeirdLocalDevqrcode-s/
+docs/
