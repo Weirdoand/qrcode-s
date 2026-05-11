@@ -64,17 +64,11 @@ export default {
       if (pathname === '/auth/me') return handleMe(request, env);
       if (pathname === '/auth/logout') return handleLogout(request, env);
 
-      // Public: live page
-      const live = pathname.match(/^\/c\/([a-zA-Z0-9_-]+)$/);
-      if (live) {
-        const accept = request.headers.get('Accept') ?? '';
-        if (accept.includes('text/html')) {
-          // Browser navigation — serve the SPA and let React Router render LivePage
-          if (env.ASSETS) return env.ASSETS.fetch(new Request(new URL('/', request.url).toString(), request));
-          return new Response('Not found', { status: 404 });
-        }
-        return handleLivePage(request, env, live[1]);
-      }
+      // /c/:slug — fall through to SPA fallback below
+
+      // Public: live page data — GET /api/codes/slug/:slug (no auth required)
+      const liveApi = pathname.match(/^\/api\/codes\/slug\/([a-zA-Z0-9_-]+)$/);
+      if (liveApi && request.method === 'GET') return handleLivePage(request, env, liveApi[1]);
 
       // Public: image proxy
       if (pathname.startsWith('/api/images/')) {
@@ -100,7 +94,18 @@ export default {
       return jsonResponse({ error: 'internal_error', message: String(err) }, 500, request, env);
     }
 
-    if (env.ASSETS) return env.ASSETS.fetch(request);
+    if (env.ASSETS) {
+      // API/auth routes that fall through here have no handler — return 404 JSON
+      if (pathname.startsWith('/api/') || pathname.startsWith('/auth/')) {
+        return jsonResponse({ error: 'not_found' }, 404, request, env);
+      }
+      // For everything else, try static assets; 404s fall back to index.html for SPA routing
+      const assetRes = await env.ASSETS.fetch(request);
+      if (assetRes.status === 404) {
+        return env.ASSETS.fetch(new Request(new URL('/', request.url).toString(), request));
+      }
+      return assetRes;
+    }
     return new Response('Not found', { status: 404 });
   },
 };
@@ -242,8 +247,7 @@ async function handleLivePage(request: Request, env: Env, slug: string): Promise
   ).bind(slug).first<CodeRow>();
 
   if (!code) {
-    if (env.ASSETS) return env.ASSETS.fetch(new Request(new URL('/', request.url).toString(), request));
-    return new Response('Not found', { status: 404 });
+    return jsonResponse({ error: 'not_found' }, 404, request, env);
   }
 
   env.DB.prepare(`UPDATE codes SET visit_count = visit_count + 1 WHERE slug = ?`).bind(slug).run().catch(() => {});

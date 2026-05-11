@@ -58,7 +58,7 @@ export const api = {
   },
 
   getLiveCode: (slug: string) =>
-    apiFetch<{ code: Code }>(`/c/${slug}`).then(r => r.code),
+    apiFetch<{ code: Code }>(`/api/codes/slug/${slug}`).then(r => r.code),
 };
 
 export function liveUrl(slug: string): string {
