@@ -34,7 +34,8 @@
       "Bash(git commit -m 'feat: restore static QR generator at /qr *)",
       "Bash(git commit *)",
       "WebFetch(domain:qrcode-s.enataljaukarenix1666.workers.dev)",
-      "Bash(echo \"EXIT:$?\")"
+      "Bash(echo \"EXIT:$?\")",
+      "Bash(echo \"---EXIT:$?\")"
     ]
   }
 }
