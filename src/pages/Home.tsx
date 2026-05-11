@@ -1,18 +1,22 @@
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../auth/AuthContext';
 import { Button } from '@/components/ui/button';
-import { QrCode, RefreshCw, Download, Shield } from 'lucide-react';
+import { QrCode, RefreshCw, Download } from 'lucide-react';
+import { LANGUAGE_LABELS, SUPPORTED_LANGUAGES } from '../i18n/index';
 
 export default function Home() {
+  const { t, i18n } = useTranslation();
   const { user, loading, login } = useAuth();
   const navigate = useNavigate();
 
   function handleCTA() {
-    if (user) {
-      navigate('/dashboard');
-    } else {
-      login();
-    }
+    if (user) navigate('/dashboard');
+    else login();
+  }
+
+  function changeLanguage(lang: string) {
+    i18n.changeLanguage(lang);
   }
 
   return (
@@ -25,14 +29,25 @@ export default function Home() {
           </div>
           <span className="text-lg font-semibold tracking-tight text-white">LiveQR</span>
         </div>
-        <div>
+        <div className="flex items-center gap-3">
+          <select
+            value={i18n.language}
+            onChange={e => changeLanguage(e.target.value)}
+            className="bg-transparent text-slate-400 text-xs border border-white/10 rounded px-2 py-1 cursor-pointer hover:text-white"
+          >
+            {SUPPORTED_LANGUAGES.map(lang => (
+              <option key={lang} value={lang} className="bg-slate-900 text-slate-300">
+                {LANGUAGE_LABELS[lang]}
+              </option>
+            ))}
+          </select>
           {loading ? null : user ? (
             <Button size="sm" onClick={() => navigate('/dashboard')} className="bg-sky-400 text-slate-950 hover:bg-sky-300 font-semibold">
-              Dashboard
+              {t('nav.dashboard')}
             </Button>
           ) : (
             <Button size="sm" onClick={login} variant="outline" className="border-white/20 text-white hover:bg-white/10 bg-transparent">
-              Sign in with Google
+              {t('nav.signIn')}
             </Button>
           )}
         </div>
@@ -42,17 +57,16 @@ export default function Home() {
       <main className="flex-1 flex flex-col items-center justify-center px-4 py-24 text-center">
         <div className="mb-6 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-sky-400/10 border border-sky-400/20 text-sky-400 text-xs font-semibold uppercase tracking-widest">
           <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse" />
-          Always up-to-date
+          {t('home.badge')}
         </div>
 
         <h1 className="text-4xl sm:text-6xl font-bold text-white tracking-tight mb-6 max-w-3xl leading-tight">
-          One QR code.{' '}
-          <span className="text-sky-400">Update it forever.</span>
+          {t('home.headline1')}{' '}
+          <span className="text-sky-400">{t('home.headline2')}</span>
         </h1>
 
         <p className="text-slate-400 text-lg max-w-xl mb-10 leading-relaxed">
-          Create a permanent QR code that always points to your latest content.
-          Change the group invite screenshot anytime — no need to reprint or redistribute the code.
+          {t('home.sub')}
         </p>
 
         <Button
@@ -60,29 +74,17 @@ export default function Home() {
           onClick={handleCTA}
           className="bg-sky-400 text-slate-950 hover:bg-sky-300 font-bold px-8 h-12 text-base shadow-[0_0_30px_rgba(56,189,248,0.3)] transition-all hover:shadow-[0_0_40px_rgba(56,189,248,0.5)]"
         >
-          {user ? 'Go to Dashboard' : 'Get started — it\'s free'}
+          {user ? t('home.ctaDashboard') : t('home.cta')}
         </Button>
 
         {/* Feature grid */}
         <div className="mt-24 grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl w-full">
           {[
-            {
-              icon: <QrCode className="h-5 w-5 text-sky-400" />,
-              title: 'Permanent QR Code',
-              desc: 'The QR code URL never changes, so printed codes stay valid forever.',
-            },
-            {
-              icon: <RefreshCw className="h-5 w-5 text-sky-400" />,
-              title: 'Update Anytime',
-              desc: 'Upload a new image or change the link in seconds from your dashboard.',
-            },
-            {
-              icon: <Download className="h-5 w-5 text-sky-400" />,
-              title: 'Download & Share',
-              desc: 'Download your permanent QR as a high-res PNG to print or share.',
-            },
-          ].map(f => (
-            <div key={f.title} className="glass-panel rounded-xl p-6 text-left">
+            { icon: <QrCode className="h-5 w-5 text-sky-400" />, title: t('home.feature1Title'), desc: t('home.feature1Desc') },
+            { icon: <RefreshCw className="h-5 w-5 text-sky-400" />, title: t('home.feature2Title'), desc: t('home.feature2Desc') },
+            { icon: <Download className="h-5 w-5 text-sky-400" />, title: t('home.feature3Title'), desc: t('home.feature3Desc') },
+          ].map((f, i) => (
+            <div key={i} className="glass-panel rounded-xl p-6 text-left">
               <div className="mb-3 w-9 h-9 rounded-lg bg-sky-400/10 flex items-center justify-center">
                 {f.icon}
               </div>
@@ -94,7 +96,7 @@ export default function Home() {
       </main>
 
       <footer className="py-8 text-center text-slate-600 text-xs border-t border-white/5">
-        LiveQR · {new Date().getFullYear()}
+        {t('footer.copy', { year: new Date().getFullYear() })}
       </footer>
     </div>
   );
