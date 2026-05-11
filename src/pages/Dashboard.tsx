@@ -5,9 +5,10 @@ import { useAuth } from '../auth/AuthContext';
 import { api, type Code, liveUrl, formatDate } from '../lib/api';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { toast } from 'sonner';
 import { Toaster } from '@/components/ui/sonner';
+import { toast } from 'sonner';
 import { Plus, QrCode, ExternalLink, Pencil, Trash2, BarChart2, LogOut, Copy } from 'lucide-react';
+import { LANGUAGE_LABELS, SUPPORTED_LANGUAGES } from '../i18n/index';
 
 export default function Dashboard() {
   const { t, i18n } = useTranslation();
@@ -57,6 +58,10 @@ export default function Dashboard() {
     navigate('/');
   }
 
+  function changeLanguage(lang: string) {
+    i18n.changeLanguage(lang);
+  }
+
   return (
     <div className="min-h-screen flex flex-col">
       <header className="px-5 py-4 border-b border-white/5 flex justify-between items-center bg-black/20 backdrop-blur-md sticky top-0 z-20">
@@ -65,6 +70,15 @@ export default function Dashboard() {
           <span className="text-base font-semibold text-white">LiveQR</span>
         </div>
         <div className="flex items-center gap-3">
+          <select
+            value={i18n.language}
+            onChange={e => changeLanguage(e.target.value)}
+            className="bg-transparent text-slate-400 text-xs border border-white/10 rounded px-2 py-1 cursor-pointer hover:text-white"
+          >
+            {SUPPORTED_LANGUAGES.map(lang => (
+              <option key={lang} value={lang} className="bg-slate-900 text-slate-300">{LANGUAGE_LABELS[lang]}</option>
+            ))}
+          </select>
           {user && (
             <div className="flex items-center gap-2">
               <img src={user.picture} alt="" className="w-7 h-7 rounded-full" />
@@ -122,6 +136,9 @@ export default function Dashboard() {
                   <div className="flex items-center gap-2 mb-1">
                     <h3 className="text-white font-semibold truncate">{code.title}</h3>
                     <span className="text-xs px-1.5 py-0.5 rounded bg-sky-400/10 text-sky-400 font-mono shrink-0">{code.slug}</span>
+                    {code.type === 'url' && (
+                      <span className="text-xs px-1.5 py-0.5 rounded bg-blue-400/10 text-blue-400 font-mono shrink-0">URL</span>
+                    )}
                   </div>
                   {code.description && <p className="text-slate-400 text-sm truncate mb-1">{code.description}</p>}
                   <div className="flex items-center gap-4 text-xs text-slate-500">

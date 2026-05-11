@@ -250,7 +250,10 @@ async function handleLivePage(request: Request, env: Env, slug: string): Promise
     return jsonResponse({ error: 'not_found' }, 404, request, env);
   }
 
-  env.DB.prepare(`UPDATE codes SET visit_count = visit_count + 1 WHERE slug = ?`).bind(slug).run().catch(() => {});
+  // Fire-and-forget visit count increment
+  env.DB.prepare(`UPDATE codes SET visit_count = visit_count + 1 WHERE slug = ?`).bind(slug).run().catch(err => {
+    console.error('visit_count increment failed:', err);
+  });
 
   return jsonResponse({ code }, 200, request, env);
 }
@@ -472,8 +475,9 @@ function corsHeaders(request: Request, env: Env): Headers {
   const headers = new Headers();
   const origin = request.headers.get('Origin');
   const allowed = getAllowedOrigins(env);
-  if (origin && allowed.includes(origin)) {
-    headers.set('Access-Control-Allow-Origin', origin);
+  // Allow if origin is in allowed list, or if no origins are configured (allow all)
+  if (!allowed.length || (origin && allowed.includes(origin))) {
+    headers.set('Access-Control-Allow-Origin', origin ?? '*');
     headers.set('Vary', 'Origin');
     headers.set('Access-Control-Allow-Credentials', 'true');
     headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');

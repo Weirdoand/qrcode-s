@@ -8,14 +8,21 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Toaster } from '@/components/ui/sonner';
 import { toast } from 'sonner';
-import { ArrowLeft, Upload, X, Image as ImageIcon, Loader2 } from 'lucide-react';
+import { ArrowLeft, Upload, X, Image as ImageIcon, Link, Loader2 } from 'lucide-react';
+
+type CodeType = 'image' | 'url';
 
 export default function CreateCode() {
   const { t } = useTranslation();
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const [step, setStep] = useState<1 | 2>(1);
+  const [codeType, setCodeType] = useState<CodeType>('image');
+
+  // Step 2 fields
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [target, setTarget] = useState(''); // image URL or link
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -23,6 +30,11 @@ export default function CreateCode() {
   const inputRef = useRef<HTMLInputElement>(null);
 
   if (!loading && !user) { navigate('/'); return null; }
+
+  function selectType(type: CodeType) {
+    setCodeType(type);
+    setStep(2);
+  }
 
   function handleFileSelect(selected: File) {
     if (!['image/jpeg', 'image/png', 'image/webp'].includes(selected.type)) {
@@ -34,6 +46,7 @@ export default function CreateCode() {
       return;
     }
     setFile(selected);
+    setTarget(URL.createObjectURL(selected));
     setPreview(URL.createObjectURL(selected));
   }
 
@@ -47,11 +60,17 @@ export default function CreateCode() {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     if (!title.trim()) { toast.error(t('create.titleRequired')); return; }
-    if (!file) { toast.error(t('create.imageRequired')); return; }
+    if (codeType === 'image' && !file) { toast.error(t('create.imageRequired')); return; }
+    if (codeType === 'url' && !target.trim()) { toast.error(t('create.urlRequired')); return; }
+
     setUploading(true);
     try {
-      const { url } = await api.uploadImage(file);
-      await api.createCode({ title: title.trim(), description: description.trim() || undefined, type: 'image', target: url });
+      let finalTarget = target;
+      if (codeType === 'image' && file) {
+        const { url } = await api.uploadImage(file);
+        finalTarget = url;
+      }
+      await api.createCode({ title: title.trim(), description: description.trim() || undefined, type: codeType, target: finalTarget });
       toast.success(t('create.success'));
       navigate('/dashboard');
     } catch (err) {
@@ -63,10 +82,57 @@ export default function CreateCode() {
     }
   }
 
+  // Step 1: choose type
+  if (step === 1) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <header className="px-5 py-4 border-b border-white/5 flex items-center gap-4 bg-black/20 backdrop-blur-md sticky top-0 z-20">
+          <Button size="sm" variant="ghost" onClick={() => navigate('/dashboard')} className="text-slate-400 hover:text-white hover:bg-white/10 -ml-1">
+            <ArrowLeft className="h-4 w-4 mr-1.5" />{t('create.back')}
+          </Button>
+          <span className="text-white font-semibold">{t('create.pageTitle')}</span>
+        </header>
+
+        <main className="flex-1 flex flex-col items-center justify-center px-4 py-12">
+          <h2 className="text-2xl font-bold text-white mb-8 text-center">{t('create.chooseType')}</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full max-w-md">
+            <button
+              onClick={() => selectType('image')}
+              className="glass-panel rounded-xl p-8 flex flex-col items-center gap-4 hover:bg-white/5 transition-colors border-2 border-transparent hover:border-sky-400/30 group"
+            >
+              <div className="w-16 h-16 rounded-2xl bg-sky-400/10 flex items-center justify-center group-hover:bg-sky-400/20 transition-colors">
+                <ImageIcon className="h-8 w-8 text-sky-400" />
+              </div>
+              <div className="text-center">
+                <p className="text-white font-semibold text-lg mb-1">{t('create.typeImage')}</p>
+                <p className="text-slate-400 text-sm">{t('create.typeImageDesc')}</p>
+              </div>
+            </button>
+
+            <button
+              onClick={() => selectType('url')}
+              className="glass-panel rounded-xl p-8 flex flex-col items-center gap-4 hover:bg-white/5 transition-colors border-2 border-transparent hover:border-sky-400/30 group"
+            >
+              <div className="w-16 h-16 rounded-2xl bg-sky-400/10 flex items-center justify-center group-hover:bg-sky-400/20 transition-colors">
+                <Link className="h-8 w-8 text-sky-400" />
+              </div>
+              <div className="text-center">
+                <p className="text-white font-semibold text-lg mb-1">{t('create.typeUrl')}</p>
+                <p className="text-slate-400 text-sm">{t('create.typeUrlDesc')}</p>
+              </div>
+            </button>
+          </div>
+        </main>
+        <Toaster position="bottom-right" />
+      </div>
+    );
+  }
+
+  // Step 2: fill in details
   return (
     <div className="min-h-screen flex flex-col">
       <header className="px-5 py-4 border-b border-white/5 flex items-center gap-4 bg-black/20 backdrop-blur-md sticky top-0 z-20">
-        <Button size="sm" variant="ghost" onClick={() => navigate('/dashboard')} className="text-slate-400 hover:text-white hover:bg-white/10 -ml-1">
+        <Button size="sm" variant="ghost" onClick={() => setStep(1)} className="text-slate-400 hover:text-white hover:bg-white/10 -ml-1">
           <ArrowLeft className="h-4 w-4 mr-1.5" />{t('create.back')}
         </Button>
         <span className="text-white font-semibold">{t('create.pageTitle')}</span>
@@ -82,35 +148,51 @@ export default function CreateCode() {
             <Label className="text-xs uppercase tracking-widest text-slate-400 font-semibold">{t('create.descLabel')} <span className="text-slate-600 normal-case">{t('create.descOptional')}</span></Label>
             <Input placeholder={t('create.descPlaceholder')} value={description} onChange={e => setDescription(e.target.value)} className="input-field-style h-11 text-white" maxLength={200} />
           </div>
-          <div className="space-y-2">
-            <Label className="text-xs uppercase tracking-widest text-slate-400 font-semibold">{t('create.imageLabel')} *</Label>
-            {!file ? (
-              <div
-                className={`border-2 border-dashed rounded-xl p-10 flex flex-col items-center justify-center gap-3 cursor-pointer transition-colors ${dragOver ? 'border-sky-400 bg-sky-400/5' : 'border-white/10 hover:border-white/25'}`}
-                onDragOver={e => { e.preventDefault(); setDragOver(true); }}
-                onDragLeave={() => setDragOver(false)}
-                onDrop={handleDrop}
-                onClick={() => inputRef.current?.click()}
-              >
-                <div className="w-12 h-12 rounded-xl bg-sky-400/10 flex items-center justify-center">
-                  <ImageIcon className="h-6 w-6 text-sky-400" />
+
+          {codeType === 'image' ? (
+            <div className="space-y-2">
+              <Label className="text-xs uppercase tracking-widest text-slate-400 font-semibold">{t('create.imageLabel')} *</Label>
+              {!file ? (
+                <div
+                  className={`border-2 border-dashed rounded-xl p-10 flex flex-col items-center justify-center gap-3 cursor-pointer transition-colors ${dragOver ? 'border-sky-400 bg-sky-400/5' : 'border-white/10 hover:border-white/25'}`}
+                  onDragOver={e => { e.preventDefault(); setDragOver(true); }}
+                  onDragLeave={() => setDragOver(false)}
+                  onDrop={handleDrop}
+                  onClick={() => inputRef.current?.click()}
+                >
+                  <div className="w-12 h-12 rounded-xl bg-sky-400/10 flex items-center justify-center">
+                    <ImageIcon className="h-6 w-6 text-sky-400" />
+                  </div>
+                  <div className="text-center">
+                    <p className="text-white font-medium">{t('create.dropHint')} <span className="text-sky-400">{t('create.browse')}</span></p>
+                    <p className="text-slate-500 text-sm mt-1">{t('create.dropSub')}</p>
+                  </div>
+                  <input ref={inputRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) handleFileSelect(f); }} />
                 </div>
-                <div className="text-center">
-                  <p className="text-white font-medium">{t('create.dropHint')} <span className="text-sky-400">{t('create.browse')}</span></p>
-                  <p className="text-slate-500 text-sm mt-1">{t('create.dropSub')}</p>
+              ) : (
+                <div className="relative rounded-xl overflow-hidden bg-black/30 border border-white/10">
+                  <img src={preview!} alt="preview" className="w-full object-contain max-h-72" />
+                  <Button type="button" size="sm" variant="ghost" className="absolute top-2 right-2 bg-black/60 hover:bg-black/80 text-white h-7 w-7 p-0 rounded-full" onClick={() => { setFile(null); setPreview(null); setTarget(''); }}>
+                    <X className="h-3.5 w-3.5" />
+                  </Button>
+                  <div className="px-4 py-2.5 text-xs text-slate-400 truncate">{file.name} · {(file.size / 1024).toFixed(0)} KB</div>
                 </div>
-                <input ref={inputRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) handleFileSelect(f); }} />
-              </div>
-            ) : (
-              <div className="relative rounded-xl overflow-hidden bg-black/30 border border-white/10">
-                <img src={preview!} alt="preview" className="w-full object-contain max-h-72" />
-                <Button type="button" size="sm" variant="ghost" className="absolute top-2 right-2 bg-black/60 hover:bg-black/80 text-white h-7 w-7 p-0 rounded-full" onClick={() => { setFile(null); setPreview(null); }}>
-                  <X className="h-3.5 w-3.5" />
-                </Button>
-                <div className="px-4 py-2.5 text-xs text-slate-400 truncate">{file.name} · {(file.size / 1024).toFixed(0)} KB</div>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          ) : (
+            <div className="space-y-2">
+              <Label className="text-xs uppercase tracking-widest text-slate-400 font-semibold">{t('create.urlLabel')} *</Label>
+              <Input
+                type="url"
+                placeholder={t('create.urlPlaceholder')}
+                value={target}
+                onChange={e => setTarget(e.target.value)}
+                className="input-field-style h-11 text-white"
+              />
+              <p className="text-slate-600 text-xs">{t('create.urlHint')}</p>
+            </div>
+          )}
+
           <Button type="submit" disabled={uploading} className="w-full h-11 bg-sky-400 text-slate-950 hover:bg-sky-300 font-bold">
             {uploading ? (<><Loader2 className="h-4 w-4 mr-2 animate-spin" />{t('create.submitting')}</>) : (<><Upload className="h-4 w-4 mr-2" />{t('create.submit')}</>)}
           </Button>
