@@ -225,7 +225,7 @@ async function handleUpload(request: Request, env: Env, session: SessionPayload)
   try { formData = await request.formData(); } catch { return jsonResponse({ error: 'invalid_form_data' }, 400, request, env); }
 
   const file = formData.get('file');
-  if (!file || !(file instanceof File)) return jsonResponse({ error: 'file_required' }, 400, request, env);
+  if (!file || typeof file !== 'object' || !(file instanceof globalThis.File)) return jsonResponse({ error: 'file_required' }, 400, request, env);
   if (!ALLOWED_MIME.includes(file.type)) return jsonResponse({ error: 'invalid_file_type', allowed: ALLOWED_MIME }, 400, request, env);
   if (file.size > MAX_UPLOAD_SIZE) return jsonResponse({ error: 'file_too_large', maxMB: 5 }, 400, request, env);
 
