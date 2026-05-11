@@ -22,8 +22,7 @@ export default function QRGenerator() {
   const [bgColor, setBgColor] = useState('#ffffff');
   const [format, setFormat] = useState<QRFormat>('png');
 
-  const previewSize = 400;
-  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(content || ' ')}&size=${previewSize}x${previewSize}&margin=${margin[0]}&color=${color.replace('#', '')}&bgcolor=${bgColor.replace('#', '')}&ecc=Q&format=${format}`;
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(content || ' ')}&size=${size[0]}x${size[0]}&margin=${margin[0]}&color=${color.replace('#', '')}&bgcolor=${bgColor.replace('#', '')}&ecc=Q&format=${format}`;
 
   function changeLanguage(lang: string) {
     i18n.changeLanguage(lang);
