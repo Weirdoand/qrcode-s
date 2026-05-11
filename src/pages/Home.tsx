@@ -30,6 +30,9 @@ export default function Home() {
           <span className="text-lg font-semibold tracking-tight text-white">LiveQR</span>
         </div>
         <div className="flex items-center gap-3">
+          <Button size="sm" variant="ghost" onClick={() => navigate('/qr')} className="text-slate-400 hover:text-white hover:bg-white/10 text-xs">
+            QR {t('tool.title')}
+          </Button>
           <select
             value={i18n.language}
             onChange={e => changeLanguage(e.target.value)}

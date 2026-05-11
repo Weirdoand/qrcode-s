@@ -102,4 +102,16 @@ export default {
   footer: {
     copy: 'LiveQR · {{year}}',
   },
+  tool: {
+    title: '生成기',
+    createTitle: '새 QR 코드 만들기',
+    createSub: '아래에 콘텐츠를 입력하고 인코딩 매개변수를 구성하세요.',
+    content: '데이터 콘텐츠',
+    size: '크기 (px)',
+    margin: '여백 (마진)',
+    fgColor: '전경색',
+    bgColor: '배경색',
+    download: '생성 및 내보내기',
+    output: '출력 형식',
+  },
 } as const;

@@ -102,4 +102,16 @@ export default {
   footer: {
     copy: 'LiveQR · {{year}}',
   },
+  tool: {
+    title: 'ジェネレーター',
+    createTitle: '新規QRコード作成',
+    createSub: ' 아래에 콘텐츠를 입력하고 인코딩 매개변수를 구성하세요.',
+    content: 'データコンテンツ',
+    size: 'サイズ (px)',
+    margin: '余白（マージン）',
+    fgColor: '前景色',
+    bgColor: '背景色',
+    download: '生成してエクスポート',
+    output: '出力形式',
+  },
 } as const;

@@ -4,6 +4,7 @@ import Dashboard from './pages/Dashboard';
 import CreateCode from './pages/CreateCode';
 import EditCode from './pages/EditCode';
 import LivePage from './pages/LivePage';
+import QRGenerator from './pages/QRGenerator';
 
 export default function App() {
   return (
@@ -13,6 +14,7 @@ export default function App() {
       <Route path="/dashboard/new" element={<CreateCode />} />
       <Route path="/dashboard/:id" element={<EditCode />} />
       <Route path="/c/:slug" element={<LivePage />} />
+      <Route path="/qr" element={<QRGenerator />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

@@ -102,4 +102,16 @@ export default {
   footer: {
     copy: 'LiveQR · {{year}}',
   },
+  tool: {
+    title: '生成器',
+    createTitle: '创建新二维码',
+    createSub: '输入内容并配置编码参数。',
+    content: '数据内容',
+    size: '尺寸 (px)',
+    margin: '白边 (边距)',
+    fgColor: '前景色',
+    bgColor: '背景色',
+    download: '生成并导出',
+    output: '输出格式',
+  },
 } as const;

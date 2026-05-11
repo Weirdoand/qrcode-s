@@ -102,4 +102,16 @@ export default {
   footer: {
     copy: 'LiveQR · {{year}}',
   },
+  tool: {
+    title: 'Generator',
+    createTitle: 'Neuen QR-Code erstellen',
+    createSub: 'Inhalt eingeben und Kodierungsparameter unten konfigurieren.',
+    content: 'Dateninhalt',
+    size: 'Größe (px)',
+    margin: 'Ruhzone (Rand)',
+    fgColor: 'Vordergrundfarbe',
+    bgColor: 'Hintergrundfarbe',
+    download: 'Kompilieren & Exportieren',
+    output: 'AUSGABE',
+  },
 } as const;

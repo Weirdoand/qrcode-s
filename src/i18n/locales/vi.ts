@@ -102,4 +102,16 @@ export default {
   footer: {
     copy: 'LiveQR · {{year}}',
   },
+  tool: {
+    title: 'Trình tạo mã',
+    createTitle: 'Tạo QR mới',
+    createSub: 'Nhập nội dung và cấu hình các tham số mã hóa bên dưới.',
+    content: 'Nội dung dữ liệu',
+    size: 'Kích thước (px)',
+    margin: 'Vùng trắng (lề)',
+    fgColor: 'Màu chính',
+    bgColor: 'Màu nền',
+    download: 'Biên dịch & Xuất',
+    output: 'Định dạng đầu ra',
+  },
 } as const;
