@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,13 +7,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Slider } from '@/components/ui/slider';
 import { Toaster } from '@/components/ui/sonner';
 import { toast } from 'sonner';
-import { Download, Share2, RefreshCw, CheckCircle2 } from 'lucide-react';
+import { Download, Share2, RefreshCw, CheckCircle2, ArrowLeft } from 'lucide-react';
 import { LANGUAGE_LABELS, SUPPORTED_LANGUAGES } from '../i18n/index';
 
 type QRFormat = 'png' | 'jpg' | 'svg';
 
-export default function QR生器() {
+export default function QRGenerator() {
   const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
   const [content, setContent] = useState('https://example.com');
   const [size, setSize] = useState([1000]);
   const [margin, setMargin] = useState([4]);
@@ -51,7 +52,11 @@ export default function QR生器() {
   return (
     <div className="min-h-screen flex flex-col">
       <header className="p-4 border-b border-white/5 flex justify-between items-center bg-black/20 backdrop-blur-md sticky top-0 z-10">
-        <span className="text-white font-semibold">QR {t('tool.title')}</span>
+        <Button size="sm" variant="ghost" onClick={() => navigate('/')} className="text-slate-400 hover:text-white hover:bg-white/10 -ml-1">
+          <ArrowLeft className="h-4 w-4 mr-1.5" />
+          {t('create.back')}
+        </Button>
+        <span className="text-white font-semibold absolute left-1/2 -translate-x-1/2">QR {t('tool.title')}</span>
         <select value={i18n.language} onChange={e => changeLanguage(e.target.value)} className="bg-transparent text-slate-400 text-xs border border-white/10 rounded px-2 py-1 cursor-pointer">
           {SUPPORTED_LANGUAGES.map(lang => (
             <option key={lang} value={lang} className="bg-slate-900">{LANGUAGE_LABELS[lang]}</option>
