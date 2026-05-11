@@ -96,7 +96,8 @@ export default {
 
     if (env.ASSETS) {
       // API/auth routes that fall through here have no handler — return 404 JSON
-      if (pathname.startsWith('/api/') || pathname.startsWith('/auth/')) {
+      // (but allow /api/images/ to fall through to the image proxy handler above)
+      if (pathname.startsWith('/api/') && !pathname.startsWith('/api/images/')) {
         return jsonResponse({ error: 'not_found' }, 404, request, env);
       }
       // For everything else, try static assets; 404s fall back to index.html for SPA routing
@@ -250,10 +251,13 @@ async function handleLivePage(request: Request, env: Env, slug: string): Promise
     return jsonResponse({ error: 'not_found' }, 404, request, env);
   }
 
-  // Fire-and-forget visit count increment
-  env.DB.prepare(`UPDATE codes SET visit_count = visit_count + 1 WHERE slug = ?`).bind(slug).run().catch(err => {
+  // Increment visit count (awaited to ensure it completes before response is sent)
+  try {
+    const result = await env.DB.prepare(`UPDATE codes SET visit_count = visit_count + 1 WHERE slug = ?`).bind(slug).run();
+    console.error('visit_count incremented, changes:', result.meta?.changes, 'for slug:', slug);
+  } catch (err) {
     console.error('visit_count increment failed:', err);
-  });
+  }
 
   return jsonResponse({ code }, 200, request, env);
 }

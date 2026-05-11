@@ -1,0 +1,40 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e \"const s = require\\('fs'\\).readFileSync\\('vite.config.ts','utf8'\\); console.log\\(JSON.stringify\\(s\\)\\);\")",
+      "Bash(npx tsc *)",
+      "Bash(npx --no-install wrangler deploy --config worker/wrangler.toml --dry-run --outdir worker/.tmp-deploy)",
+      "Bash(npx wrangler *)",
+      "Bash(node *)",
+      "Bash(npm run *)",
+      "Bash(powershell *)",
+      "Bash(nvm version *)",
+      "Bash(fnm *)",
+      "Bash(curl *)",
+      "Bash(python -c \"import sys,json; z=json.load\\(sys.stdin\\)['result']; print\\('status:', z['status']\\)\")",
+      "Bash(findstr /C:\"original_registrar\")",
+      "Bash(nslookup *)",
+      "Bash(git add *)",
+      "Bash(git restore *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git config *)",
+      "Bash(git push *)",
+      "Bash(git commit -m 'fix: serve SPA HTML for browser navigation on /c/:slug *)",
+      "WebSearch",
+      "WebFetch(domain:developers.cloudflare.com)",
+      "Bash(git commit -m 'fix: correctly route live page data API and SPA fallback *)",
+      "Bash(git commit -m 'feat: add i18n support for 7 languages \\(en, zh, ja, ko, vi, de, fr\\) *)",
+      "Bash(npm uninstall *)",
+      "Bash(git commit -m 'fix: simplify i18n init, remove broken browser-languagedetector *)",
+      "Bash(grep -o '.\"dashboard\".\\\\{1,500\\\\}' dist/assets/index-vL2al11Q.js)",
+      "Bash(git commit -m 'fix: use correct i18next resource structure {translation: locale} *)",
+      "Bash(npm list *)",
+      "Bash(Select-String '\"visit_count\"')",
+      "Bash(git commit -m 'fix: use globalThis.File in instanceof check for Cloudflare runtime compatibility *)",
+      "Bash(git commit -m 'feat: restore static QR generator at /qr *)",
+      "Bash(git commit *)",
+      "WebFetch(domain:qrcode-s.enataljaukarenix1666.workers.dev)",
+      "Bash(echo \"EXIT:$?\")"
+    ]
+  }
+}
