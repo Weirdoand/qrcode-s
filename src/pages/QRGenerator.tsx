@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
@@ -20,7 +21,6 @@ export default function QRGenerator() {
   const [color, setColor] = useState('#000000');
   const [bgColor, setBgColor] = useState('#ffffff');
   const [format, setFormat] = useState<QRFormat>('png');
-  const [isGenerating, setIsGenerating] = useState(false);
 
   const previewSize = 400;
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(content || ' ')}&size=${previewSize}x${previewSize}&margin=${margin[0]}&color=${color.replace('#', '')}&bgcolor=${bgColor.replace('#', '')}&ecc=Q&format=${format}`;
@@ -135,7 +135,7 @@ export default function QRGenerator() {
           {/* Preview */}
           <div className="md:col-span-5 bg-black/30 p-6 md:p-10 flex flex-col items-center justify-center relative min-h-[400px]">
             <div className="bg-slate-800 p-8 rounded-xl shadow-2xl mb-8 w-full max-w-[280px] flex items-center justify-center aspect-square ring-1 ring-white/10">
-              <img src={qrUrl} alt="QR Code" className="w-full h-full object-contain shadow-2xl" onLoad={() => setIsGenerating(false)} />
+              <img src={qrUrl} alt="QR Code" className="w-full h-full object-contain shadow-2xl" />
             </div>
 
             <div className="flex flex-col gap-4 w-full">
