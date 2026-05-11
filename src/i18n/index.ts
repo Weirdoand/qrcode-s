@@ -1,6 +1,5 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
-import LanguageDetector from 'i18next-browser-languagedetector';
 
 import en from './locales/en';
 import zh from './locales/zh';
@@ -25,20 +24,30 @@ export const LANGUAGE_LABELS: Record<SupportedLanguage, string> = {
 
 const resources = { en, zh, ja, ko, vi, de, fr };
 
+function getInitialLanguage(): string {
+  // Check localStorage first, then browser language
+  try {
+    const stored = localStorage.getItem('i18nextLng');
+    if (stored && SUPPORTED_LANGUAGES.includes(stored as SupportedLanguage)) {
+      return stored;
+    }
+  } catch {}
+  const browserLang = navigator.language.split('-')[0];
+  if (SUPPORTED_LANGUAGES.includes(browserLang as SupportedLanguage)) {
+    return browserLang;
+  }
+  return 'en';
+}
+
 i18n
-  .use(LanguageDetector)
   .use(initReactI18next)
   .init({
     resources,
+    lng: getInitialLanguage(),
     fallbackLng: 'en',
     debug: false,
     interpolation: {
       escapeValue: false,
-    },
-    detection: {
-      order: ['navigator', 'htmlTag', 'path'],
-      caches: ['localStorage'],
-      lookupLocalStorage: 'language',
     },
   });
 
